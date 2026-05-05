@@ -1,0 +1,119 @@
+@startuml
+!define table(x) class x << (T,#FFE0B3) >>
+!define primary_key(x) <b><color:darkgreen>x</color></b>
+!define foreign_key(x) <color:blue>x</color>
+!define unique(x) <i><color:purple>x</color></i>
+
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FEFEFE
+skinparam class {
+    BackgroundColor #FFF2E0
+    BorderColor #B8860B
+    ArrowColor #8B4513
+}
+
+table(dim_category) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    unique(category) : VARCHAR NOT NULL
+}
+
+table(dim_pet) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    pet_type : VARCHAR NOT NULL
+    pet_name : VARCHAR NOT NULL
+    pet_breed : VARCHAR NOT NULL
+    pet_customer_email : VARCHAR NOT NULL
+}
+
+table(dim_customer) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    customer_first_name : VARCHAR NOT NULL
+    customer_last_name : VARCHAR NOT NULL
+    customer_age : INTEGER NOT NULL
+    unique(customer_email) : VARCHAR NOT NULL
+    customer_country : VARCHAR NOT NULL
+    customer_postal_code : VARCHAR
+}
+
+table(dim_product) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    product_name : VARCHAR NOT NULL
+    product_category : VARCHAR NOT NULL
+    product_price : NUMERIC NOT NULL
+    product_quantity : INTEGER NOT NULL
+    product_weight : NUMERIC NOT NULL
+    product_color : VARCHAR NOT NULL
+    product_size : VARCHAR NOT NULL
+    product_brand : VARCHAR NOT NULL
+    product_material : VARCHAR NOT NULL
+    product_description : TEXT NOT NULL
+    product_rating : NUMERIC(3,2) NOT NULL
+    product_reviews : INTEGER NOT NULL
+    product_release_date : DATE NOT NULL
+    product_expiry_date : DATE NOT NULL
+}
+
+table(dim_seller) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    seller_first_name : VARCHAR NOT NULL
+    seller_last_name : VARCHAR NOT NULL
+    unique(seller_email) : VARCHAR NOT NULL
+    seller_country : VARCHAR NOT NULL
+    seller_postal_code : VARCHAR
+}
+
+table(dim_store) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    store_name : VARCHAR NOT NULL
+    store_location : VARCHAR NOT NULL
+    store_city : VARCHAR NOT NULL
+    store_state : VARCHAR
+    store_country : VARCHAR NOT NULL
+    store_phone : VARCHAR NOT NULL
+    unique(store_email) : VARCHAR NOT NULL
+}
+
+table(dim_supplier) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    supplier_name : VARCHAR NOT NULL
+    supplier_contact : VARCHAR NOT NULL
+    unique(supplier_email) : VARCHAR NOT NULL
+    supplier_phone : VARCHAR NOT NULL
+    supplier_address : VARCHAR NOT NULL
+    supplier_city : VARCHAR NOT NULL
+    supplier_country : VARCHAR NOT NULL
+}
+
+' Таблица фактов
+table(fact_sale) {
+    * primary_key(id) : bigint GENERATED ALWAYS AS IDENTITY
+    --
+    sale_date : DATE
+    sale_quantity : INTEGER
+    sale_total_price : NUMERIC(12,2)
+    --
+    foreign_key(category_id) : bigint
+    foreign_key(pet_id) : bigint
+    foreign_key(customer_id) : bigint
+    foreign_key(product_id) : bigint
+    foreign_key(seller_id) : bigint
+    foreign_key(store_id) : bigint
+    foreign_key(supplier_id) : bigint
+}
+
+dim_category ||--o{ fact_sale : "REFERENCES dim_category(id)"
+dim_pet ||--o{ fact_sale : "REFERENCES dim_pet(id)"
+dim_customer ||--o{ fact_sale : "REFERENCES dim_customer(id)"
+dim_product ||--o{ fact_sale : "REFERENCES dim_product(id)"
+dim_seller ||--o{ fact_sale : "REFERENCES dim_seller(id)"
+dim_store ||--o{ fact_sale : "REFERENCES dim_store(id)"
+dim_supplier ||--o{ fact_sale : "REFERENCES dim_supplier(id)"
+
+@enduml
